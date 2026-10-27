@@ -17,3 +17,5 @@ Responsive layout follows screen width automatically. Below 760px, the canvas us
 Touch navigation: spread two fingers to zoom in, pinch to zoom out, and drag two fingers to pan. Single-finger drawing resumes after both fingers lift. Pinching cancels the first touch mark, including fill operations; artwork and undo history stay intact. The Fit button resets the view.
 
 Free canvas navigation (v0.3.0): two-finger panning can move the artwork beyond all viewport edges. Select the Hand tool (H) to drag using one finger or a mouse. Fit recenters the canvas. Pan and zoom never alter exported pixels.
+
+PWA (v0.4.0): install from the Studio menu or browser install UI. On iOS, use Safari → Share → Add to Home Screen. Open online once and wait for Ready for offline use. Service worker scope is relative to the editor path, so both GitHub Pages `/pyxelstudio/dist/` and the standalone Site work. Offline shell includes all local assets and icons; no external font dependency. Updates wait for Update app rather than reloading active work. Save a `.pxweb` backup before installing or moving between browser profiles, because installed-app storage can be separate.
