@@ -48,3 +48,19 @@ $('open').onclick=()=>$('file').click();$('file').onchange=async e=>{const f=e.t
 $('help').onclick=()=>$('help-dialog').showModal();document.onkeydown=e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)||document.querySelector('dialog[open]'))return;const k=e.key.toLowerCase();if(e.ctrlKey||e.metaKey){if(k==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click()}if(k==='s'){e.preventDefault();$('save').click()}return}const t=Object.keys(keys).find(t=>keys[t].toLowerCase()===k);if(t)setTool(t)};
 function demo(){layers=[makeLayer('Evening sky'),makeLayer('Island & cabin'),makeLayer('Little details')];selected=0;function rect(x,y,w,h,c){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)put(xx,yy,c)}for(let y=0;y<H;y++)rect(0,y,W,1,y<28?'#384350':y<35?'#4a5472':y<39?'#657898':'#3e6060');rect(43,9,8,8,'#efb56b');rect(41,11,12,4,'#efb56b');rect(43,17,8,1,'#c77976');rect(8,13,12,2,'#586470');rect(6,15,21,2,'#586470');rect(28,23,14,2,'#586470');rect(25,25,22,2,'#586470');selected=1;for(let y=37;y<52;y++){const half=Math.floor((y<43?(y-34)*2:(54-y)*2));rect(32-half,y,half*2,1,y<43?'#78a174':y<47?'#55826d':'#323d47')}rect(22,30,20,12,'#af8867');rect(24,32,16,9,'#c9ac80');for(let y=22;y<32;y++){let half=y-21;rect(32-half,y,half*2,1,'#935363');rect(31-half,y,2,1,'#c77976')}rect(38,22,3,6,'#586470');rect(28,34,5,8,'#44334a');rect(35,33,4,4,'#f5d48b');rect(24,33,2,4,'#efb56b');rect(23,42,21,2,'#8c929a');rect(29,44,3,3,'#bbc1bc');rect(26,47,4,2,'#bbc1bc');rect(16,34,2,9,'#62577b');for(let y=21;y<37;y++){const half=Math.floor((y-19)/3);rect(17-half,y,half*2+1,1,y%4===0?'#78a174':'#55826d')}rect(47,36,2,6,'#62577b');for(let y=26;y<38;y++){const half=Math.floor((y-24)/3);rect(48-half,y,half*2+1,1,y%4===0?'#78a174':'#55826d')}selected=2;[[9,8],[25,6],[35,13],[55,23],[15,24],[57,7],[5,29]].forEach(([x,y])=>put(x,y,'#bbc1bc'));[[7,46,7],[45,48,10],[16,56,14],[38,59,9],[3,61,5],[53,55,7]].forEach(([x,y,w])=>rect(x,y,w,1,'#55826d'));rect(32,53,9,1,'#789ba0');rect(35,55,4,1,'#789ba0');[[20,41],[41,41],[19,43],[44,43]].forEach(([x,y])=>put(x,y,'#f5d48b'));selected=1;render();renderLayers()}
 try{const saved=localStorage.getItem('pyxel-studio-v1');if(saved)restore(saved);else demo()}catch{demo()}setColor(color);buttons();requestAnimationFrame(fit);let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(fit,150)});
+
+// Layout is a view preference; artwork and history are shared across both modes.
+function setMode(mode,persist=true){
+  endStroke();document.body.dataset.mode=mode;
+  document.querySelectorAll('[data-mode-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.modeChoice===mode)));
+  if(persist)try{localStorage.setItem('pyxel-studio-layout',mode)}catch{}
+  requestAnimationFrame(fit);
+}
+document.querySelectorAll('[data-mode-choice]').forEach(b=>b.onclick=()=>setMode(b.dataset.modeChoice));
+document.querySelectorAll('[data-panel]').forEach(b=>b.onclick=()=>{
+  const panel=document.body.dataset.panel===b.dataset.panel?'':b.dataset.panel;
+  document.body.dataset.panel=panel;
+  document.querySelectorAll('[data-panel]').forEach(button=>button.setAttribute('aria-expanded',String(button.dataset.panel===panel)));
+});
+let storedMode;try{storedMode=localStorage.getItem('pyxel-studio-layout')}catch{}
+setMode(['desktop','mobile'].includes(storedMode)?storedMode:(matchMedia('(max-width:760px)').matches?'mobile':'desktop'),false);
