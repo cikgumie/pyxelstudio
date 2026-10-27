@@ -8,4 +8,4 @@ Features: pencil, eraser, flood fill, color picker, line, rectangle, layers (vis
 
 This is a new implementation. Original PyxelEdit `.pyxel` files, tilesets and animation are not supported in this initial version. Keep downloaded `.pxweb` files for durable backups; browser autosave belongs to the current origin and browser profile.
 
-Layout modes: use the Desktop / Mobile switch in the header. The first visit selects a layout from screen width; explicit selection is remembered on this device. Mobile uses touch drawing, a horizontal toolbar, and collapsible Colors / Layers panels. Switching modes preserves the current canvas, layers and undo history.
+Responsive layout follows screen width automatically. Below 760px, the canvas uses the available viewport, file operations move into a hamburger menu, colors open in a dropdown, and layers open from the menu. Drawing tools stay in a compact bottom toolbar. No Desktop / Mobile switch.
