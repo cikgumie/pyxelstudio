@@ -1,6 +1,10 @@
 # Pyxel Studio
 
+[Open the editor](https://cikgumie.github.io/pyxelstudio/).
+
 Independent browser pixel art editor inspired by classic desktop workflows. Vanilla HTML, CSS and JavaScript; no build step or application dependencies.
+
+GitHub Pages: serve the `main` branch from `/ (root)`. The root `index.html` opens the editor in `dist/`; `.nojekyll` keeps the deployment as plain static files.
 
 Serve `dist` with `python3 -m http.server 4173 --directory dist`, then open http://localhost:4173.
 
