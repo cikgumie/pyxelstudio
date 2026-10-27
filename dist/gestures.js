@@ -23,7 +23,7 @@ function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing,
       suppress(e);
     } else if (navigating) suppress(e);
     // Capture even touches that start in the canvas margin.
-    if (e.target !== canvas || navigating) area.setPointerCapture(e.pointerId);
+    if (e.target !== canvas) area.setPointerCapture(e.pointerId);
   }, { capture: true, passive: false });
   area.addEventListener('pointermove', e => {
     if (!touches.has(e.pointerId)) return;
@@ -49,6 +49,8 @@ function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing,
   area.addEventListener('pointerup', release, { capture: true, passive: false });
   area.addEventListener('pointercancel', release, { capture: true, passive: false });
   area.addEventListener('lostpointercapture', e => {
-    if (touches.has(e.pointerId)) release(e);
+    // A bubbling loss from the canvas is a capture handoff, not a finger lift.
+    // Only the area losing its own capture can cancel an active touch here.
+    if (e.target === area && touches.has(e.pointerId)) release(e);
   }, { capture: true });
 }

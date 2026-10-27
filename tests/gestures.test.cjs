@@ -13,8 +13,8 @@ function setup() {
   install({ area, canvas, getZoom: () => zoom, setZoom: value => { zoom = value; },
     captureDrawing: () => baseline,
     cancelDrawing: value => { assert.equal(value, baseline); cancellations++; } });
-  function send(type, id, x, y, pointerType = 'touch') {
-    const e = { pointerId: id, pointerType, clientX: x, clientY: y, target: canvas,
+  function send(type, id, x, y, pointerType = 'touch', target = canvas) {
+    const e = { pointerId: id, pointerType, clientX: x, clientY: y, target,
       prevented: false, stopped: false,
       preventDefault() { this.prevented = true; }, stopImmediatePropagation() { this.stopped = true; } };
     handlers[type](e); return e;
@@ -64,6 +64,14 @@ test('a third finger or lost capture does not leave gestures stuck', () => {
   s.send('pointerdown', 3, 200, 0); assert.equal(s.cancellations, 1);
   s.send('pointerup', 1, 0, 0); s.send('pointermove', 3, 300, 0);
   assert.equal(s.zoom, 8);
-  s.send('lostpointercapture', 2, 100, 0); s.send('pointercancel', 3, 300, 0);
+  s.send('lostpointercapture', 2, 100, 0, 'touch', s.area); s.send('pointercancel', 3, 300, 0);
   assert.equal(s.send('pointerdown', 4, 30, 30).stopped, false);
+});
+test('canvas capture handoff must not remove a finger or stop pinch zoom', () => {
+  const s = setup();
+  s.send('pointerdown', 1, 40, 80); s.send('pointerdown', 2, 120, 80);
+  s.send('lostpointercapture', 2, 120, 80);
+  s.send('pointermove', 2, 200, 80);
+  assert.equal(s.zoom, 8);
+  assert.equal(s.cancellations, 1);
 });
