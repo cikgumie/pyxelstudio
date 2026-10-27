@@ -6,3 +6,7 @@ html,body{width:100%;height:100%;overflow:hidden}body{height:100dvh;display:flex
 }
 @media(max-width:360px){.brand{font-size:16px}.brandmark{display:none}header{gap:3px}.quick-actions>button,.icon-button{min-width:34px}.tools>button{width:40px}}
 @media(max-width:760px) and (max-height:480px){header{height:46px;min-height:46px}.workspace-bar{height:32px;min-height:32px}.tools{padding-block:2px}.tools>button{height:36px}.workspace-footer{display:none}body[data-menu="open"] nav{top:46px}.inspector{top:52px!important}#mobile-backdrop{top:46px}}
+
+/* Margins center a small canvas while keeping every edge scrollable when zoomed. */
+.canvas-area{touch-action:none;justify-content:flex-start;align-items:flex-start}
+.canvas-wrap{margin:auto}

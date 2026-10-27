@@ -13,3 +13,5 @@ Features: pencil, eraser, flood fill, color picker, line, rectangle, layers (vis
 This is a new implementation. Original PyxelEdit `.pyxel` files, tilesets and animation are not supported in this initial version. Keep downloaded `.pxweb` files for durable backups; browser autosave belongs to the current origin and browser profile.
 
 Responsive layout follows screen width automatically. Below 760px, the canvas uses the available viewport, file operations move into a hamburger menu, colors open in a dropdown, and layers open from the menu. Drawing tools stay in a compact bottom toolbar. No Desktop / Mobile switch.
+
+Touch navigation: spread two fingers to zoom in, pinch to zoom out, and drag two fingers to pan. Single-finger drawing resumes after both fingers lift. Pinching cancels the first touch mark, including fill operations; artwork and undo history stay intact. The Fit button resets the view.

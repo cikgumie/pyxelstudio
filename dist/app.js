@@ -70,3 +70,16 @@ $('menu-export').onclick=()=>{closeMobileUI();$('export').click()};$('menu-help'
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileUI(true)});
 function responsiveLayout(){endStroke();closeMobileUI();document.body.dataset.mode=phoneLayout.matches?'mobile':'desktop';requestAnimationFrame(fit)}
 phoneLayout.addEventListener('change',responsiveLayout);responsiveLayout();buttons();setColor(color);
+
+installCanvasGestures({
+  area:$('canvas-area'),canvas:art,getZoom:()=>zoom,
+  setZoom:value=>{zoom=value;sizeCanvas()},
+  captureDrawing:()=>({state:snapshot(),history:history.slice(),future:future.slice()}),
+  cancelDrawing:baseline=>{
+    drawing=false;
+    if(!baseline)return;
+    clearTimeout(saveTimer);
+    restore(baseline.state);history=baseline.history;future=baseline.future;
+    autosave();buttons();
+  }
+});
