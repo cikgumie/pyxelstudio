@@ -22,3 +22,5 @@ body[data-tool="hand"] #art:active,body[data-tool="hand"] .canvas-area:active{cu
 #pwa-status{font-size:11px;line-height:1.6;color:#a6ba86;padding:3px 5px}
 @media(max-width:1100px){.header-end{gap:6px}.header-end button{padding-inline:8px}}
 @media(max-width:760px){header #install-app,header #update-app{display:none}header{padding-top:env(safe-area-inset-top);height:calc(54px + env(safe-area-inset-top));min-height:calc(54px + env(safe-area-inset-top))}body[data-menu="open"] nav{top:calc(54px + env(safe-area-inset-top))}#mobile-backdrop{top:calc(54px + env(safe-area-inset-top))}body[data-panel="colors"] .inspector,body[data-panel="layers"] .inspector{top:calc(60px + env(safe-area-inset-top))}#install-dialog p{font-size:12px}}
+
+@media(max-width:760px){.tools>.history-action{align-items:center;justify-content:center;color:#c6c9ce;font-size:26px}.tools>#mobile-redo{border-right:1px solid var(--line);border-radius:0;margin-right:4px}.tools>button{padding-inline:2px}}

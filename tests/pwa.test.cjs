@@ -39,9 +39,9 @@ for (const scope of ['https://cikgumie.github.io/pyxelstudio/dist/', 'https://st
   test('offline shell and all versioned assets work under ' + new URL(scope).pathname, async () => {
     const w = worker(scope); await w.lifecycle('install'); await w.lifecycle('activate');
     w.online = false;
-    assert.match(await (await w.request(scope + '?v=0.4.0')).text(), /id="art"/);
+    assert.match(await (await w.request(scope + '?v=0.4.1')).text(), /id="art"/);
     for (const file of ['app.js', 'gestures.js', 'pwa.js', 'style.css']) {
-      assert.equal(await (await w.request(scope + file + '?v=0.4.0', 'same-origin')).text(), 'asset');
+      assert.equal(await (await w.request(scope + file + '?v=0.4.1', 'same-origin')).text(), 'asset');
     }
     assert.equal(w.claims, 1); assert.equal(w.skips, 0);
   });

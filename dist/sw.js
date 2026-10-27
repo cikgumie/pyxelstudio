@@ -1,10 +1,10 @@
-const VERSION = '0.4.0';
+const VERSION = '0.4.1';
 const CACHE_PREFIX = 'pyxel-studio-shell-' + new URL(self.registration.scope).pathname + '-';
 const CACHE = CACHE_PREFIX + VERSION;
 const scopeURL = path => new URL(path, self.registration.scope).href;
 const INDEX = scopeURL('index.html');
-const SHELL = ['index.html', 'style.css?v=0.4.0', 'app.js?v=0.4.0',
-  'gestures.js?v=0.4.0', 'pwa.js?v=0.4.0', 'manifest.webmanifest',
+const SHELL = ['index.html', 'style.css?v=0.4.1', 'app.js?v=0.4.1',
+  'gestures.js?v=0.4.1', 'pwa.js?v=0.4.1', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png'];
 
 async function isEditor(response) {
