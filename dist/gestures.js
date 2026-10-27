@@ -1,7 +1,7 @@
 /* Two-finger canvas navigation. Kept separate from drawing tools. */
-function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing, cancelDrawing }) {
+function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing, cancelDrawing, panBy, isHandTool = () => false }) {
   const touches = new Map();
-  let baseline = null, navigating = false, gesture = null;
+  let baseline = null, navigating = false, gesture = null, handDrag = null;
   const position = e => ({ x: e.clientX, y: e.clientY });
   const midpoint = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
   const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -13,19 +13,24 @@ function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing,
   }
   function suppress(e) { e.preventDefault(); e.stopImmediatePropagation(); }
   area.addEventListener('pointerdown', e => {
-    if (e.pointerType !== 'touch') return;
-    if (!touches.size) baseline = e.target === canvas ? captureDrawing() : null;
+    if (e.pointerType !== 'touch') {
+      if (isHandTool() && e.button === 0) {handDrag={id:e.pointerId,...position(e)};area.setPointerCapture(e.pointerId);suppress(e)}
+      return;
+    }
+    if (!touches.size) baseline = e.target === canvas && !isHandTool() ? captureDrawing() : null;
     touches.set(e.pointerId, position(e));
     if (touches.size >= 2) {
       if (!navigating) cancelDrawing(baseline);
-      navigating = true;
+      navigating = true;handDrag = null;
       begin();
       suppress(e);
     } else if (navigating) suppress(e);
+    else if(isHandTool()){handDrag={id:e.pointerId,...position(e)};area.setPointerCapture(e.pointerId);suppress(e)}
     // Capture even touches that start in the canvas margin.
     if (e.target !== canvas) area.setPointerCapture(e.pointerId);
   }, { capture: true, passive: false });
   area.addEventListener('pointermove', e => {
+    if(handDrag?.id===e.pointerId){panBy(e.clientX-handDrag.x,e.clientY-handDrag.y);handDrag={id:e.pointerId,...position(e)};if(touches.has(e.pointerId))touches.set(e.pointerId,position(e));suppress(e);return}
     if (!touches.has(e.pointerId)) return;
     touches.set(e.pointerId, position(e));
     if (!navigating) return;
@@ -34,10 +39,10 @@ function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing,
     const [a, b] = [...touches.values()], mid = midpoint(a, b);
     setZoom(Math.max(.25, Math.min(24, gesture.zoom * distance(a, b) / gesture.distance)));
     const rect = canvas.getBoundingClientRect();
-    area.scrollLeft += rect.left + gesture.x * getZoom() - mid.x;
-    area.scrollTop += rect.top + gesture.y * getZoom() - mid.y;
+    panBy(mid.x - rect.left - gesture.x * getZoom(), mid.y - rect.top - gesture.y * getZoom());
   }, { capture: true, passive: false });
   function release(e) {
+    if(handDrag?.id===e.pointerId){handDrag=null;suppress(e)}
     if (!touches.has(e.pointerId)) return;
     touches.delete(e.pointerId);
     if (navigating) suppress(e);
@@ -51,6 +56,6 @@ function installCanvasGestures({ area, canvas, getZoom, setZoom, captureDrawing,
   area.addEventListener('lostpointercapture', e => {
     // A bubbling loss from the canvas is a capture handoff, not a finger lift.
     // Only the area losing its own capture can cancel an active touch here.
-    if (e.target === area && touches.has(e.pointerId)) release(e);
+    if (e.target === area && (touches.has(e.pointerId)||handDrag?.id===e.pointerId)) release(e);
   }, { capture: true });
 }

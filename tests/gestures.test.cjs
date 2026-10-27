@@ -4,22 +4,22 @@ const { readFileSync } = require('node:fs');
 const vm = require('node:vm');
 const install = vm.runInNewContext(readFileSync(require('node:path').join(__dirname, '../dist/gestures.js'), 'utf8') + '\ninstallCanvasGestures;');
 
-function setup() {
-  let zoom = 4, cancellations = 0;
+function setup(hand = false) {
+  let zoom = 4, cancellations = 0, panX = 0, panY = 0;
   const baseline = { artwork: 'before touch', undo: ['previous edit'] }, handlers = {};
   const area = { scrollLeft: 0, scrollTop: 0, setPointerCapture() {},
     addEventListener(name, fn) { handlers[name] = fn; } };
-  const canvas = { getBoundingClientRect: () => ({ left: -area.scrollLeft, top: -area.scrollTop }) };
-  install({ area, canvas, getZoom: () => zoom, setZoom: value => { zoom = value; },
+  const canvas = { getBoundingClientRect: () => ({ left: panX, top: panY }) };
+  install({ area, canvas, isHandTool:()=>hand, panBy:(x,y)=>{panX+=x;panY+=y;}, getZoom: () => zoom, setZoom: value => { zoom = value; },
     captureDrawing: () => baseline,
     cancelDrawing: value => { assert.equal(value, baseline); cancellations++; } });
   function send(type, id, x, y, pointerType = 'touch', target = canvas) {
-    const e = { pointerId: id, pointerType, clientX: x, clientY: y, target,
+    const e = { pointerId: id, pointerType, button:0, clientX: x, clientY: y, target,
       prevented: false, stopped: false,
       preventDefault() { this.prevented = true; }, stopImmediatePropagation() { this.stopped = true; } };
     handlers[type](e); return e;
   }
-  return { send, area, get zoom() { return zoom; }, get cancellations() { return cancellations; } };
+  return { send, area, get panX(){return panX},get panY(){return panY}, get zoom() { return zoom; }, get cancellations() { return cancellations; } };
 }
 
 test('one finger and mouse remain available for drawing', () => {
@@ -37,11 +37,11 @@ test('pinch zoom keeps the pixel under the gesture midpoint anchored', () => {
   assert.equal(s.cancellations, 1);
   s.send('pointermove', 2, 200, 80);
   assert.equal(s.zoom, 8);
-  assert.equal(s.area.scrollLeft, 40); assert.equal(s.area.scrollTop, 80);
+  assert.equal(s.panX, -40); assert.equal(s.panY, -80);
   // Translate both fingers equally: scale stays fixed, scroll position changes.
   s.send('pointermove', 1, 20, 60); s.send('pointermove', 2, 180, 60);
   assert.equal(s.zoom, 8);
-  assert.equal(s.area.scrollLeft, 60); assert.equal(s.area.scrollTop, 100);
+  assert.equal(s.panX, -60); assert.equal(s.panY, -100);
 });
 test('pinch in reduces zoom and caps zoom at safe limits', () => {
   const s = setup();
@@ -74,4 +74,20 @@ test('canvas capture handoff must not remove a finger or stop pinch zoom', () =>
   s.send('pointermove', 2, 200, 80);
   assert.equal(s.zoom, 8);
   assert.equal(s.cancellations, 1);
+});
+
+test('hand tool pans beyond every canvas edge without drawing or zooming',()=>{
+  const s=setup(true);
+  assert.equal(s.send('pointerdown',1,0,0).stopped,true);
+  s.send('pointermove',1,2000,-3000);
+  assert.equal(s.panX,2000);assert.equal(s.panY,-3000);assert.equal(s.zoom,4);
+  s.send('pointerup',1,2000,-3000);
+  assert.equal(s.cancellations,0);
+});
+test('mouse hand dragging and cancellation release the hand',()=>{
+  const s=setup(true);
+  s.send('pointerdown',1,10,10,'mouse');s.send('pointermove',1,-500,900,'mouse');
+  assert.equal(s.panX,-510);assert.equal(s.panY,890);
+  s.send('pointercancel',1,-500,900,'mouse');s.send('pointermove',1,20,20,'mouse');
+  assert.equal(s.panX,-510);
 });

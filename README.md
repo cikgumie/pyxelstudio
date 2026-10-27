@@ -15,3 +15,5 @@ This is a new implementation. Original PyxelEdit `.pyxel` files, tilesets and an
 Responsive layout follows screen width automatically. Below 760px, the canvas uses the available viewport, file operations move into a hamburger menu, colors open in a dropdown, and layers open from the menu. Drawing tools stay in a compact bottom toolbar. No Desktop / Mobile switch.
 
 Touch navigation: spread two fingers to zoom in, pinch to zoom out, and drag two fingers to pan. Single-finger drawing resumes after both fingers lift. Pinching cancels the first touch mark, including fill operations; artwork and undo history stay intact. The Fit button resets the view.
+
+Free canvas navigation (v0.3.0): two-finger panning can move the artwork beyond all viewport edges. Select the Hand tool (H) to drag using one finger or a mouse. Fit recenters the canvas. Pan and zoom never alter exported pixels.
